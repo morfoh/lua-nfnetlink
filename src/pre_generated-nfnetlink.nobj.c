@@ -1428,6 +1428,8 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "\n"
 "int nlif_fd(nlif_handle *);\n"
 "\n"
+"int nlif_catch(nlif_handle *);\n"
+"\n"
 "int nlif_query(nlif_handle *);\n"
 "\n"
 "\n"
@@ -1723,6 +1725,14 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "  return rc_nlif_fd\n"
 "end\n"
 "\n"
+"-- method: catch\n"
+"function _meth.nlif_handle.catch(self)\n"
+"  \n"
+"  local rc_nlif_catch = 0\n"
+"  rc_nlif_catch = C.nlif_catch(self)\n"
+"  return rc_nlif_catch\n"
+"end\n"
+"\n"
 "-- method: query\n"
 "function _meth.nlif_handle.query(self)\n"
 "  \n"
@@ -1784,6 +1794,16 @@ static int nlif_handle__fd__meth(lua_State *L) {
   this = obj_type_nlif_handle_check(L,1);
   rc_nlif_fd = nlif_fd(this);
   lua_pushinteger(L, rc_nlif_fd);
+  return 1;
+}
+
+/* method: catch */
+static int nlif_handle__catch__meth(lua_State *L) {
+  nlif_handle * this;
+  int rc_nlif_catch = 0;
+  this = obj_type_nlif_handle_check(L,1);
+  rc_nlif_catch = nlif_catch(this);
+  lua_pushinteger(L, rc_nlif_catch);
   return 1;
 }
 
@@ -1882,6 +1902,7 @@ static const luaL_reg obj_nlif_handle_pub_funcs[] = {
 static const luaL_reg obj_nlif_handle_methods[] = {
   {"close", nlif_handle__close__meth},
   {"fd", nlif_handle__fd__meth},
+  {"catch", nlif_handle__catch__meth},
   {"query", nlif_handle__query__meth},
   {"index2name", nlif_handle__index2name__meth},
   {"get_ifflags", nlif_handle__get_ifflags__meth},
