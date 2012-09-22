@@ -4,5 +4,6 @@ local nlif = nfnl.nlif_handle()
 print("nlif handle:", nlif)
 
 print("nlif fd:", nlif:fd())
+print("nlif query:", nlif:query())
 
 nlif:close()
