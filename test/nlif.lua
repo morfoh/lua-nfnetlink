@@ -6,13 +6,15 @@ print("nlif handle:", nlif)
 print("nlif fd:", nlif:fd())
 print("nlif query:", nlif:query())
 
-print("nlif index2name:")
+print("nlif index2name/get_ifflags:")
+print("index", "name", "flags")
 local ifidx = -1
 repeat
 	ifidx = ifidx + 1
-	ifname = nlif:index2name(ifidx)
+	local ifname = nlif:index2name(ifidx)
 	if ifname then
-		print(ifidx, ifname)
+		local ifflags = nlif:get_ifflags(ifidx)
+		print(ifidx, ifname, ifflags)
 	end
 until ifname == nil
 
