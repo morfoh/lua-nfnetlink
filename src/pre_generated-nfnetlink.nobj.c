@@ -1797,6 +1797,27 @@ static int nlif_handle__query__meth(lua_State *L) {
   return 1;
 }
 
+/* method: index2name */
+static int nlif_handle__index2name__meth(lua_State *L) {
+  nlif_handle * this;
+  unsigned int ifindex;
+  char * ifname = NULL;
+  this = obj_type_nlif_handle_check(L,1);
+  ifindex = luaL_checkinteger(L,2);
+  int rc;
+  char name[IFNAMSIZ];
+		
+  rc = nlif_index2name(this, ifindex, name);
+  if (rc == -1) {
+	  lua_pushnil(L);
+	  return 1;
+  }
+  ifname = name;
+		
+  lua_pushstring(L, ifname);
+  return 1;
+}
+
 
 
 static const luaL_reg obj_nfnl_handle_pub_funcs[] = {
@@ -1841,6 +1862,7 @@ static const luaL_reg obj_nlif_handle_methods[] = {
   {"close", nlif_handle__close__meth},
   {"fd", nlif_handle__fd__meth},
   {"query", nlif_handle__query__meth},
+  {"index2name", nlif_handle__index2name__meth},
   {NULL, NULL}
 };
 
