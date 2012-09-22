@@ -1426,6 +1426,8 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "\n"
 "void nlif_close(nlif_handle *);\n"
 "\n"
+"int nlif_fd(nlif_handle *);\n"
+"\n"
 "\n"
 "]]\n"
 "\n"
@@ -1711,6 +1713,14 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "end\n"
 "_priv.nlif_handle.__gc = _meth.nlif_handle.close\n"
 "\n"
+"-- method: fd\n"
+"function _meth.nlif_handle.fd(self)\n"
+"  \n"
+"  local rc_nlif_fd = 0\n"
+"  rc_nlif_fd = C.nlif_fd(self)\n"
+"  return rc_nlif_fd\n"
+"end\n"
+"\n"
 "_push.nlif_handle = obj_type_nlif_handle_push\n"
 "ffi.metatype(\"nlif_handle\", _priv.nlif_handle)\n"
 "-- End \"nlif_handle\" FFI interface\n"
@@ -1757,6 +1767,16 @@ static int nlif_handle__close__meth(lua_State *L) {
   return 0;
 }
 
+/* method: fd */
+static int nlif_handle__fd__meth(lua_State *L) {
+  nlif_handle * this;
+  int rc_nlif_fd = 0;
+  this = obj_type_nlif_handle_check(L,1);
+  rc_nlif_fd = nlif_fd(this);
+  lua_pushinteger(L, rc_nlif_fd);
+  return 1;
+}
+
 
 
 static const luaL_reg obj_nfnl_handle_pub_funcs[] = {
@@ -1799,6 +1819,7 @@ static const luaL_reg obj_nlif_handle_pub_funcs[] = {
 
 static const luaL_reg obj_nlif_handle_methods[] = {
   {"close", nlif_handle__close__meth},
+  {"fd", nlif_handle__fd__meth},
   {NULL, NULL}
 };
 
