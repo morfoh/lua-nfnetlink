@@ -49,6 +49,11 @@ object "nlif_handle" {
 		c_method_call "int" "nlif_fd" {}
 	},
 
+	-- receive message from netlink and update interface table
+	method "catch" {
+		c_method_call "int" "nlif_catch" {}
+	},
+
 	-- request a dump of interfaces available in the system 
 	method "query" {
 		c_method_call "int" "nlif_query" {}
