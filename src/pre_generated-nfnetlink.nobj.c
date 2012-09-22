@@ -1818,6 +1818,27 @@ static int nlif_handle__index2name__meth(lua_State *L) {
   return 1;
 }
 
+/* method: get_ifflags */
+static int nlif_handle__get_ifflags__meth(lua_State *L) {
+  nlif_handle * this;
+  unsigned int ifindex;
+  unsigned int ifflags = 0;
+  this = obj_type_nlif_handle_check(L,1);
+  ifindex = luaL_checkinteger(L,2);
+  int rc;
+  unsigned int flags;
+		
+  rc = nlif_get_ifflags(this, ifindex, &flags);
+  if (rc == -1) {
+	  lua_pushnil(L);
+	  return 1;
+  }
+  ifflags = flags;
+		
+  lua_pushinteger(L, ifflags);
+  return 1;
+}
+
 
 
 static const luaL_reg obj_nfnl_handle_pub_funcs[] = {
@@ -1863,6 +1884,7 @@ static const luaL_reg obj_nlif_handle_methods[] = {
   {"fd", nlif_handle__fd__meth},
   {"query", nlif_handle__query__meth},
   {"index2name", nlif_handle__index2name__meth},
+  {"get_ifflags", nlif_handle__get_ifflags__meth},
   {NULL, NULL}
 };
 
