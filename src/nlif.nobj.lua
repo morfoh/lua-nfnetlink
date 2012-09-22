@@ -48,4 +48,9 @@ object "nlif_handle" {
 	method "fd" {
 		c_method_call "int" "nlif_fd" {}
 	},
+
+	-- request a dump of interfaces available in the system 
+	method "query" {
+		c_method_call "int" "nlif_query" {}
+	},
 }
