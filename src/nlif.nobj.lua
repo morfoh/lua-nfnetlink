@@ -53,4 +53,22 @@ object "nlif_handle" {
 	method "query" {
 		c_method_call "int" "nlif_query" {}
 	},
+
+	-- get the name for an ifindex
+	method "index2name" {
+		var_in { "unsigned int", "ifindex" },
+		var_out { "char *", "ifname" },
+		c_source "pre_src" [[
+  int rc;
+  char name[IFNAMSIZ];
+		]],
+		c_source [[
+  rc = nlif_index2name(${this}, ${ifindex}, name);
+  if (rc == -1) {
+	  lua_pushnil(L);
+	  return 1;
+  }
+  ${ifname} = name;
+		]],
+	},
 }
