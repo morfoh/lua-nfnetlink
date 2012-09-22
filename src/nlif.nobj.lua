@@ -71,4 +71,22 @@ object "nlif_handle" {
   ${ifname} = name;
 		]],
 	},
+
+	-- get the flags for an ifindex
+	method "get_ifflags" {
+		var_in { "unsigned int", "ifindex" },
+		var_out { "unsigned int", "ifflags" },
+		c_source "pre_src" [[
+  int rc;
+  unsigned int flags;
+		]],
+		c_source [[
+  rc = nlif_get_ifflags(${this}, ${ifindex}, &flags);
+  if (rc == -1) {
+	  lua_pushnil(L);
+	  return 1;
+  }
+  ${ifflags} = flags;
+		]],
+	},
 }
