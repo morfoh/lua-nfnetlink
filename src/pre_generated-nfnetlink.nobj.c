@@ -226,6 +226,8 @@ typedef struct ffi_export_symbol {
 
 typedef struct nfnl_handle nfnl_handle;
 
+typedef struct nlif_handle nlif_handle;
+
 
 
 
@@ -234,6 +236,9 @@ static obj_type obj_types[] = {
 #define obj_type_id_nfnl_handle 0
 #define obj_type_nfnl_handle (obj_types[obj_type_id_nfnl_handle])
   { NULL, 0, OBJ_TYPE_FLAG_WEAK_REF, "nfnl_handle" },
+#define obj_type_id_nlif_handle 1
+#define obj_type_nlif_handle (obj_types[obj_type_id_nlif_handle])
+  { NULL, 1, OBJ_TYPE_FLAG_WEAK_REF, "nlif_handle" },
   {NULL, -1, 0, NULL},
 };
 
@@ -1221,6 +1226,15 @@ static char *obj_interfaces[] = {
 #define obj_type_nfnl_handle_push(L, obj, flags) \
 	obj_udata_luapush_weak(L, (void *)obj, &(obj_type_nfnl_handle), flags)
 
+#define obj_type_nlif_handle_check(L, _index) \
+	obj_udata_luacheck(L, _index, &(obj_type_nlif_handle))
+#define obj_type_nlif_handle_optional(L, _index) \
+	obj_udata_luaoptional(L, _index, &(obj_type_nlif_handle))
+#define obj_type_nlif_handle_delete(L, _index, flags) \
+	obj_udata_luadelete_weak(L, _index, &(obj_type_nlif_handle), flags)
+#define obj_type_nlif_handle_push(L, obj, flags) \
+	obj_udata_luapush_weak(L, (void *)obj, &(obj_type_nlif_handle), flags)
+
 
 
 
@@ -1395,6 +1409,7 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "\n"
 "ffi.cdef[[\n"
 "typedef struct nfnl_handle nfnl_handle;\n"
+"typedef struct nlif_handle nlif_handle;\n"
 "\n"
 "]]\n"
 "\n"
@@ -1404,6 +1419,12 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "nfnl_handle * nfnl_open();\n"
 "\n"
 "int nfnl_close(nfnl_handle *);\n"
+"\n"
+"typedef struct nlif_handle nlif_handle;\n"
+"\n"
+"nlif_handle * nlif_open();\n"
+"\n"
+"void nlif_close(nlif_handle *);\n"
 "\n"
 "\n"
 "]]\n"
@@ -1582,6 +1603,61 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "end\n"
 "\n"
 "\n"
+"local obj_type_nlif_handle_check\n"
+"local obj_type_nlif_handle_delete\n"
+"local obj_type_nlif_handle_push\n"
+"\n"
+"do\n"
+"	local obj_mt, obj_type, obj_ctype = obj_register_ctype(\"nlif_handle\", \"nlif_handle *\")\n"
+"\n"
+"	function obj_type_nlif_handle_check(ptr)\n"
+"		-- if ptr is nil or is the correct type, then just return it.\n"
+"		if not ptr or ffi.istype(obj_ctype, ptr) then return ptr end\n"
+"		-- check if it is a compatible type.\n"
+"		local ctype = tostring(ffi.typeof(ptr))\n"
+"		local bcaster = _obj_subs.nlif_handle[ctype]\n"
+"		if bcaster then\n"
+"			return bcaster(ptr)\n"
+"		end\n"
+"		return error(\"Expected 'nlif_handle *'\", 2)\n"
+"	end\n"
+"\n"
+"	function obj_type_nlif_handle_delete(ptr)\n"
+"		local id = obj_ptr_to_id(ptr)\n"
+"		local flags = nobj_obj_flags[id]\n"
+"		if not flags then return nil, 0 end\n"
+"		ffi.gc(ptr, nil)\n"
+"		nobj_obj_flags[id] = nil\n"
+"		return ptr, flags\n"
+"	end\n"
+"\n"
+"	function obj_type_nlif_handle_push(ptr, flags)\n"
+"		local id = obj_ptr_to_id(ptr)\n"
+"		-- check weak refs\n"
+"		if nobj_obj_flags[id] then return nobj_weak_objects[id] end\n"
+"\n"
+"		if flags ~= 0 then\n"
+"			nobj_obj_flags[id] = flags\n"
+"			ffi.gc(ptr, obj_mt.__gc)\n"
+"		end\n"
+"		nobj_weak_objects[id] = ptr\n"
+"		return ptr\n"
+"	end\n"
+"\n"
+"	function obj_mt:__tostring()\n"
+"		return sformat(\"nlif_handle: %p, flags=%d\", self, nobj_obj_flags[obj_ptr_to_id(self)] or 0)\n"
+"	end\n"
+"\n"
+"	-- type checking function for C API.\n"
+"	_priv[obj_type] = obj_type_nlif_handle_check\n"
+"	-- push function for C API.\n"
+"	reg_table[obj_type] = function(ptr, flags)\n"
+"		return obj_type_nlif_handle_push(ffi.cast(obj_ctype,ptr), flags)\n"
+"	end\n"
+"\n"
+"end\n"
+"\n"
+"\n"
 "local obj_type_MutableBuffer_check =\n"
 "	obj_get_interface_check(\"MutableBufferIF\", \"Expected object with MutableBuffer interface\")\n"
 "\n"
@@ -1614,6 +1690,30 @@ static const char *nfnetlink_ffi_lua_code[] = { "local ffi=require\"ffi\"\n"
 "_push.nfnl_handle = obj_type_nfnl_handle_push\n"
 "ffi.metatype(\"nfnl_handle\", _priv.nfnl_handle)\n"
 "-- End \"nfnl_handle\" FFI interface\n"
+"\n"
+"\n"
+"-- Start \"nlif_handle\" FFI interface\n"
+"-- method: new\n"
+"function _pub.nlif_handle.new()\n"
+"  local this_flags = OBJ_UDATA_FLAG_OWN\n"
+"  local self\n"
+"  self = C.nlif_open()\n"
+"  return obj_type_nlif_handle_push(self, this_flags)\n"
+"end\n"
+"register_default_constructor(_pub,\"nlif_handle\",_pub.nlif_handle.new)\n"
+"\n"
+"-- method: close\n"
+"function _meth.nlif_handle.close(self)\n"
+"  local self,this_flags = obj_type_nlif_handle_delete(self)\n"
+"  if not self then return end\n"
+"  C.nlif_close(self)\n"
+"  return \n"
+"end\n"
+"_priv.nlif_handle.__gc = _meth.nlif_handle.close\n"
+"\n"
+"_push.nlif_handle = obj_type_nlif_handle_push\n"
+"ffi.metatype(\"nlif_handle\", _priv.nlif_handle)\n"
+"-- End \"nlif_handle\" FFI interface\n"
 "\n", NULL };
 
 
@@ -1636,6 +1736,25 @@ static int nfnl_handle__close__meth(lua_State *L) {
   rc_nfnl_close = nfnl_close(this);
   lua_pushinteger(L, rc_nfnl_close);
   return 1;
+}
+
+/* method: new */
+static int nlif_handle__new__meth(lua_State *L) {
+  int this_flags = OBJ_UDATA_FLAG_OWN;
+  nlif_handle * this;
+  this = nlif_open();
+  obj_type_nlif_handle_push(L, this, this_flags);
+  return 1;
+}
+
+/* method: close */
+static int nlif_handle__close__meth(lua_State *L) {
+  int this_flags = 0;
+  nlif_handle * this;
+  this = obj_type_nlif_handle_delete(L,1,&(this_flags));
+  if(!(this_flags & OBJ_UDATA_FLAG_OWN)) { return 0; }
+  nlif_close(this);
+  return 0;
 }
 
 
@@ -1673,6 +1792,39 @@ static const reg_impl obj_nfnl_handle_implements[] = {
   {NULL, NULL}
 };
 
+static const luaL_reg obj_nlif_handle_pub_funcs[] = {
+  {"new", nlif_handle__new__meth},
+  {NULL, NULL}
+};
+
+static const luaL_reg obj_nlif_handle_methods[] = {
+  {"close", nlif_handle__close__meth},
+  {NULL, NULL}
+};
+
+static const luaL_reg obj_nlif_handle_metas[] = {
+  {"__gc", nlif_handle__close__meth},
+  {"__tostring", obj_udata_default_tostring},
+  {"__eq", obj_udata_default_equal},
+  {NULL, NULL}
+};
+
+static const obj_base obj_nlif_handle_bases[] = {
+  {-1, NULL}
+};
+
+static const obj_field obj_nlif_handle_fields[] = {
+  {NULL, 0, 0, 0}
+};
+
+static const obj_const obj_nlif_handle_constants[] = {
+  {NULL, NULL, 0.0 , 0}
+};
+
+static const reg_impl obj_nlif_handle_implements[] = {
+  {NULL, NULL}
+};
+
 static const luaL_reg nfnetlink_function[] = {
   {NULL, NULL}
 };
@@ -1685,6 +1837,7 @@ static const obj_const nfnetlink_constants[] = {
 
 static const reg_sub_module reg_sub_modules[] = {
   { &(obj_type_nfnl_handle), REG_OBJECT, obj_nfnl_handle_pub_funcs, obj_nfnl_handle_methods, obj_nfnl_handle_metas, obj_nfnl_handle_bases, obj_nfnl_handle_fields, obj_nfnl_handle_constants, obj_nfnl_handle_implements, 0},
+  { &(obj_type_nlif_handle), REG_OBJECT, obj_nlif_handle_pub_funcs, obj_nlif_handle_methods, obj_nlif_handle_metas, obj_nlif_handle_bases, obj_nlif_handle_fields, obj_nlif_handle_constants, obj_nlif_handle_implements, 0},
   {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0}
 };
 

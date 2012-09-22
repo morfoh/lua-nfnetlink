@@ -13,6 +13,7 @@ sys_include "libnfnetlink/libnfnetlink.h",
 
 subfiles {
 "src/nfnl.nobj.lua",
+"src/nlif.nobj.lua",
 },
 }
 
