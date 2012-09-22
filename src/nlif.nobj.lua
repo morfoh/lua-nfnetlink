@@ -43,4 +43,9 @@ object "nlif_handle" {
 	destructor "close" {
 		c_method_call "void" "nlif_close" {}
 	},
+
+	-- get fd of the nlif handle 
+	method "fd" {
+		c_method_call "int" "nlif_fd" {}
+	},
 }
